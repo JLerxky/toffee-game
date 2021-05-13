@@ -57,9 +57,9 @@ pub fn engine_start() {
         })
         // 日志输出
         // Adds frame time diagnostics
-        // .add_plugin(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
+        .add_plugin(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
         // Adds a system that prints diagnostics to the console
-        // .add_plugin(bevy::diagnostic::LogDiagnosticsPlugin::default())
+        .add_plugin(bevy::diagnostic::LogDiagnosticsPlugin::default())
         // Any plugin can register diagnostics
         // Uncomment this to add some render resource diagnostics:
         // .add_plugin(bevy::wgpu::diagnostic::WgpuResourceDiagnosticsPlugin::default())
@@ -133,13 +133,16 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands
         .spawn_bundle((
-            Transform::from_xyz(0.0, 5.0, 0.0),
+            Transform {
+                translation: Vec3::new(0., 5., 0.),
+                scale: Vec3::new(1., 1., 1.),
+                rotation: Quat::from_rotation_x(0.),
+            },
             GlobalTransform::identity(),
             rigid_body,
             collider,
         ))
-        .insert(bevy::render::wireframe::Wireframe)
         .with_children(|parent| {
-            parent.spawn_scene(asset_server.load("glb/taxi.glb#Scene0"));
+            parent.spawn_scene(asset_server.load("glb/AE86.glb#Scene0"));
         });
 }

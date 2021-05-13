@@ -52,31 +52,27 @@ fn setup(
         },
         ..Default::default()
     });
-    // commands.spawn_bundle(PerspectiveCameraBundle {
-    //     transform: Transform::from_xyz(1.05, 0.9, 1.5)
-    //         .looking_at(Vec3::new(0.0, 0.3, 0.0), Vec3::Y),
-    //     ..Default::default()
-    // });
 
     // Spawn the scene as a child of another entity. This first scene will be translated backward
     // with its parent
-    // commands
-    //     .spawn_bundle((
-    //         Transform::from_xyz(0.0, 0.0, -1.0),
-    //         GlobalTransform::identity(),
-    //     ))
-    //     .with_children(|parent| {
-    //         parent.spawn_scene(asset_server.load("glb/taxi.glb#Scene0"));
-    //     });
+    commands
+        .spawn_bundle((
+            Transform {
+                translation: Vec3::new(0., 0., -10.),
+                scale: Vec3::new(1., 1., 1.),
+                rotation: Quat::from_rotation_x(0.),
+            },
+            GlobalTransform::identity(),
+        ))
+        .with_children(|parent| {
+            parent.spawn_scene(asset_server.load("glb/AE86.glb#Scene0"));
+        });
 
     // Spawn a second scene, and keep its `instance_id`
-    let instance_id = scene_spawner.spawn(asset_server.load("glb/taxi.glb#Scene0"));
+    let instance_id = scene_spawner.spawn(asset_server.load("glb/AE86.glb#Scene0"));
     scene_instance.0 = Some(instance_id);
 }
 
-// This system will wait for the scene to be ready, and then tag entities from
-// the scene with `EntityInMyScene`. All entities from the second scene will be
-// tagged
 fn scene_update(
     mut commands: Commands,
     scene_spawner: Res<SceneSpawner>,
@@ -95,8 +91,6 @@ fn scene_update(
     }
 }
 
-// This system will move all entities with component `EntityInMyScene`, so all
-// entities from the second scene
 fn move_scene_entities(
     time: Res<Time>,
     mut scene_entities: Query<&mut Transform, With<EntityInMyScene>>,

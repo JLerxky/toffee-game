@@ -4,15 +4,19 @@ use bevy::{
     window::WindowMode,
     winit::WinitPlugin,
 };
+use bevy_rapier3d::{
+    physics::EventQueue,
+    rapier::{dynamics::RigidBodyBuilder, geometry::ColliderBuilder, pipeline::PhysicsPipeline},
+};
 
 pub fn engine_start() {
     App::build()
         .insert_resource(WgpuOptions {
             backend: WgpuBackend::Auto,
             power_pref: WgpuPowerOptions::HighPerformance,
-            // features: WgpuFeatures {
-            //     features: vec![WgpuFeature::NonFillPolygonMode],
-            // },
+            features: bevy::wgpu::WgpuFeatures {
+                features: vec![bevy::wgpu::WgpuFeature::NonFillPolygonMode],
+            },
             ..Default::default()
         })
         .insert_resource(WindowDescriptor {
@@ -37,15 +41,20 @@ pub fn engine_start() {
         // .insert_resource(ClearColor(Color::rgb_u8(192, 126, 104)))
         // 默认插件
         .add_plugins(DefaultPlugins)
+        .add_plugin(bevy::render::wireframe::WireframePlugin)
         // esc退出系统
         .add_system(bevy::input::system::exit_on_esc_system.system())
+        // 窗口插件
         .add_plugin(WinitPlugin::default())
-        // .add_plugin(WgpuPlugin::default())
         // 物理插件
-        // .add_plugin(RapierPhysicsPlugin)
-        // .add_plugin(RapierRenderPlugin)
-        // 设置摄像机
-        .add_startup_system(set_camera.system())
+        .add_plugin(bevy_rapier3d::physics::RapierPhysicsPlugin)
+        .add_plugin(bevy_rapier3d::render::RapierRenderPlugin)
+        // 自由摄像机
+        .add_plugin(bevy_flycam::PlayerPlugin)
+        .insert_resource(bevy_flycam::MovementSettings {
+            sensitivity: 0.00015, // default: 0.00012
+            speed: 12.0,          // default: 12.0
+        })
         // 日志输出
         // Adds frame time diagnostics
         // .add_plugin(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
@@ -59,39 +68,77 @@ pub fn engine_start() {
         // Uncomment this to add an asset count diagnostics:
         // .add_plugin(bevy::asset::diagnostic::AssetCountDiagnosticsPlugin::<Texture>::default())
         // 测试
-        .add_startup_system(setup.system())
+        .add_startup_system(setup_graphics.system())
+        .add_startup_system(setup_physics.system())
+        .add_startup_system(enable_physics_profiling.system())
+        .add_system_to_stage(CoreStage::PostUpdate, display_events.system())
         .run();
 }
 
-fn set_camera(mut commands: Commands) {
-    commands.spawn_bundle(PerspectiveCameraBundle {
-        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..Default::default()
-    });
-    commands.spawn_bundle(UiCameraBundle::default());
+fn enable_physics_profiling(mut pipeline: ResMut<PhysicsPipeline>) {
+    pipeline.counters.enable()
 }
 
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    // plane
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+fn setup_graphics(mut commands: Commands) {
+    commands.spawn().insert_bundle(LightBundle {
+        transform: Transform::from_translation(Vec3::new(100.0, 100.0, 200.0)),
+        light: Light {
+            intensity: 1000000.0,
+            range: 30000.0,
+            ..Default::default()
+        },
         ..Default::default()
     });
-    // cube
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..Default::default()
-    });
-    // light
-    commands.spawn_bundle(LightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
-    });
+}
+
+fn display_events(events: Res<EventQueue>) {
+    while let Ok(intersection_event) = events.intersection_events.pop() {
+        println!("Received intersection event: {:?}", intersection_event);
+    }
+
+    while let Ok(contact_event) = events.contact_events.pop() {
+        println!("Received contact event: {:?}", contact_event);
+    }
+}
+
+pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // commands.spawn().insert_bundle();
+    // commands.spawn_scene(asset_server.load("glb/bar.glb#Scene0"));
+    // commands.spawn_scene(asset_server.load("glb/ground.glb#Scene0"));
+    /*
+     * Ground
+     */
+    let rigid_body = RigidBodyBuilder::new_static();
+    let collider = ColliderBuilder::cuboid(10.0, 0.1, 10.);
+    // commands.spawn().insert_bundle((rigid_body, collider));
+
+    commands
+        .spawn_bundle((
+            Transform::from_xyz(0.0, 0.0, 0.0),
+            GlobalTransform::identity(),
+            rigid_body,
+            collider,
+        ))
+        .with_children(|parent| {
+            parent.spawn_scene(asset_server.load("glb/ground.glb#Scene0"));
+        });
+
+    // let rigid_body = RigidBodyBuilder::new_static().translation(0.0, 5.0, 0.0);
+    // let collider = ColliderBuilder::cuboid(4.0, 1.2, 1.0).sensor(true);
+    // commands.spawn().insert_bundle((rigid_body, collider));
+
+    let rigid_body = RigidBodyBuilder::new_dynamic().translation(0.0, 13.0, 0.0);
+    let collider = ColliderBuilder::ball(0.6);
+    // commands.spawn().insert_bundle((rigid_body, collider));
+
+    commands
+        .spawn_bundle((
+            Transform::from_xyz(0.0, 5.0, 0.0),
+            GlobalTransform::identity(),
+            rigid_body,
+            collider,
+        )).insert(bevy::render::wireframe::Wireframe)
+        .with_children(|parent| {
+            parent.spawn_scene(asset_server.load("glb/taxi.glb#Scene0"));
+        });
 }

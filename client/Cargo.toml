@@ -10,5 +10,6 @@ edition = "2018"
 bevy = "0.5"
 bevy_rapier3d = "0.9"
 bevy_egui = "0.4"
+bevy_flycam = "0.5"
 tokio = {version = "1.2", features = ["full"]}
 rand = "0.8"

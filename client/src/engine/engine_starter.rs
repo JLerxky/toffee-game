@@ -137,7 +137,8 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
             GlobalTransform::identity(),
             rigid_body,
             collider,
-        )).insert(bevy::render::wireframe::Wireframe)
+        ))
+        .insert(bevy::render::wireframe::Wireframe)
         .with_children(|parent| {
             parent.spawn_scene(asset_server.load("glb/taxi.glb#Scene0"));
         });

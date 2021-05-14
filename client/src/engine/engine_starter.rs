@@ -102,15 +102,23 @@ fn display_events(events: Res<EventQueue>) {
 }
 
 pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // commands.spawn().insert_bundle();
-    // commands.spawn_scene(asset_server.load("glb/bar.glb#Scene0"));
-    // commands.spawn_scene(asset_server.load("glb/ground.glb#Scene0"));
-    /*
-     * Ground
-     */
+    // 天空球
+    commands
+        .spawn_bundle((
+            Transform {
+                translation: Vec3::new(0., 0., -10.),
+                scale: Vec3::new(0.12, 0.12, 0.12),
+                rotation: Quat::from_rotation_x(0.),
+            },
+            GlobalTransform::identity(),
+        ))
+        .with_children(|parent| {
+            parent.spawn_scene(asset_server.load("glb/sky.glb#Scene0"));
+        });
+
+    // 地面
     let rigid_body = RigidBodyBuilder::new_static();
     let collider = ColliderBuilder::cuboid(10.0, 0.1, 10.);
-    // commands.spawn().insert_bundle((rigid_body, collider));
 
     commands
         .spawn_bundle((
@@ -123,13 +131,9 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn_scene(asset_server.load("glb/ground.glb#Scene0"));
         });
 
-    // let rigid_body = RigidBodyBuilder::new_static().translation(0.0, 5.0, 0.0);
-    // let collider = ColliderBuilder::cuboid(4.0, 1.2, 1.0).sensor(true);
-    // commands.spawn().insert_bundle((rigid_body, collider));
-
+    // 车体
     let rigid_body = RigidBodyBuilder::new_dynamic().translation(0.0, 13.0, 0.0);
     let collider = ColliderBuilder::ball(0.6);
-    // commands.spawn().insert_bundle((rigid_body, collider));
 
     commands
         .spawn_bundle((

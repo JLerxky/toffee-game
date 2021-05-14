@@ -39,8 +39,8 @@ fn setup(
     commands.spawn_bundle(LightBundle {
         transform: Transform::from_xyz(4.0, 5.0, 4.0),
         light: Light {
-            intensity: 2_000.,
-            range: 100.,
+            intensity: f32::MAX,
+            range: f32::MAX,
             ..Default::default()
         },
         ..Default::default()
@@ -49,8 +49,8 @@ fn setup(
     commands.spawn_bundle(LightBundle {
         transform: Transform::from_xyz(-4.0, 5.0, -4.0),
         light: Light {
-            intensity: 2_000.,
-            range: 100.,
+            intensity: f32::MAX,
+            range: f32::MAX,
             ..Default::default()
         },
         ..Default::default()
@@ -61,18 +61,18 @@ fn setup(
         .spawn_bundle((
             Transform {
                 translation: Vec3::new(0., 0., -10.),
-                scale: Vec3::new(1., 1., 1.),
+                scale: Vec3::new(0.12, 0.12, 0.12),
                 rotation: Quat::from_rotation_x(0.),
             },
             GlobalTransform::identity(),
         ))
         .with_children(|parent| {
-            parent.spawn_scene(asset_server.load("glb/AE86.glb#Scene0"));
+            parent.spawn_scene(asset_server.load("glb/sky.glb#Scene0"));
         });
 
     // 记录场景实体ID
-    let instance_id = scene_spawner.spawn(asset_server.load("glb/AE86.glb#Scene0"));
-    scene_instance.0 = Some(instance_id);
+    // let instance_id = scene_spawner.spawn(asset_server.load("glb/sky.glb#Scene0"));
+    // scene_instance.0 = Some(instance_id);
 }
 
 /// 给场景中的实体添加标记

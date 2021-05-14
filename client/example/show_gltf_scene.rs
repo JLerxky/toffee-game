@@ -21,19 +21,21 @@ fn main() {
         .run();
 }
 
-// Resource to hold the scene `instance_id` until it is loaded
+/// 记录场景实体ID
 #[derive(Default)]
 struct SceneInstance(Option<InstanceId>);
 
-// Component that will be used to tag entities in the scene
+/// 场景标记
 struct EntityInMyScene;
 
+/// 加载环境与场景，并记录场景实体ID
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut scene_spawner: ResMut<SceneSpawner>,
     mut scene_instance: ResMut<SceneInstance>,
 ) {
+    // 多角度光源
     commands.spawn_bundle(LightBundle {
         transform: Transform::from_xyz(4.0, 5.0, 4.0),
         light: Light {
@@ -43,6 +45,7 @@ fn setup(
         },
         ..Default::default()
     });
+    // 多角度光源
     commands.spawn_bundle(LightBundle {
         transform: Transform::from_xyz(-4.0, 5.0, -4.0),
         light: Light {
@@ -53,8 +56,7 @@ fn setup(
         ..Default::default()
     });
 
-    // Spawn the scene as a child of another entity. This first scene will be translated backward
-    // with its parent
+    // 加载对照场景
     commands
         .spawn_bundle((
             Transform {
@@ -68,11 +70,12 @@ fn setup(
             parent.spawn_scene(asset_server.load("glb/AE86.glb#Scene0"));
         });
 
-    // Spawn a second scene, and keep its `instance_id`
+    // 记录场景实体ID
     let instance_id = scene_spawner.spawn(asset_server.load("glb/AE86.glb#Scene0"));
     scene_instance.0 = Some(instance_id);
 }
 
+/// 给场景中的实体添加标记
 fn scene_update(
     mut commands: Commands,
     scene_spawner: Res<SceneSpawner>,
@@ -91,6 +94,7 @@ fn scene_update(
     }
 }
 
+/// 根据场景中实体标记遍历实体，并修改状态值
 fn move_scene_entities(
     time: Res<Time>,
     mut scene_entities: Query<&mut Transform, With<EntityInMyScene>>,

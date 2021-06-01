@@ -27,8 +27,10 @@ pub fn engine_start() {
             resizable: false,
             // 是否有窗口外壳
             decorations: true,
-            width: 1366f32,
-            height: 768f32,
+            // width: 1366f32,
+            // height: 768f32,
+            width: 1920f32,
+            height: 1080f32,
             // 窗口模式
             mode: WindowMode::Windowed,
             // 鼠标隐藏并锁定
@@ -117,23 +119,27 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 
     // 地面
-    let rigid_body = RigidBodyBuilder::new_static();
-    let collider = ColliderBuilder::cuboid(10.0, 0.1, 10.);
-
     commands
         .spawn_bundle((
-            Transform::from_xyz(0.0, 0.0, 0.0),
+            Transform::from_xyz(0.0, 5.0, 0.0),
             GlobalTransform::identity(),
-            rigid_body,
-            collider,
         ))
         .with_children(|parent| {
-            parent.spawn_scene(asset_server.load("glb/ground.glb#Scene0"));
+            parent.spawn_scene(asset_server.load("glb/tile01.glb#Scene0"));
         });
+    // 地面碰撞体
+    let rigid_body = RigidBodyBuilder::new_static();
+    let collider = ColliderBuilder::cuboid(10., 0.05, 10.);
+    commands.spawn_bundle((
+        Transform::from_xyz(0.0, 0.0, 0.0),
+        GlobalTransform::identity(),
+        rigid_body,
+        collider,
+    ));
 
     // 车体
     let rigid_body = RigidBodyBuilder::new_dynamic().translation(0.0, 13.0, 0.0);
-    let collider = ColliderBuilder::ball(0.6);
+    let collider = ColliderBuilder::ball(1.);
 
     commands
         .spawn_bundle((

@@ -4,10 +4,7 @@ use bevy::{
     window::WindowMode,
     winit::WinitPlugin,
 };
-use bevy_rapier3d::{
-    physics::EventQueue,
-    rapier::{dynamics::RigidBodyBuilder, geometry::ColliderBuilder, pipeline::PhysicsPipeline},
-};
+use bevy_rapier3d::prelude::*;
 
 pub fn engine_start() {
     App::build()
@@ -49,8 +46,8 @@ pub fn engine_start() {
         // 窗口插件
         .add_plugin(WinitPlugin::default())
         // 物理插件
-        .add_plugin(bevy_rapier3d::physics::RapierPhysicsPlugin)
-        .add_plugin(bevy_rapier3d::render::RapierRenderPlugin)
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugin(RapierRenderPlugin)
         // 自由摄像机
         .add_plugin(bevy_flycam::PlayerPlugin)
         .insert_resource(bevy_flycam::MovementSettings {
@@ -93,12 +90,15 @@ fn setup_graphics(mut commands: Commands) {
     });
 }
 
-fn display_events(events: Res<EventQueue>) {
-    while let Ok(intersection_event) = events.intersection_events.pop() {
+fn display_events(
+    mut intersection_events: EventReader<IntersectionEvent>,
+    mut contact_events: EventReader<ContactEvent>,
+) {
+    for intersection_event in intersection_events.iter() {
         println!("Received intersection event: {:?}", intersection_event);
     }
 
-    while let Ok(contact_event) = events.contact_events.pop() {
+    for contact_event in contact_events.iter() {
         println!("Received contact event: {:?}", contact_event);
     }
 }
@@ -121,37 +121,40 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
     // 地面
     commands
         .spawn_bundle((
-            Transform::from_xyz(0.0, 5.0, 0.0),
+            Transform::from_xyz(0.0, 8.0, 0.0),
             GlobalTransform::identity(),
         ))
         .with_children(|parent| {
             parent.spawn_scene(asset_server.load("glb/tile01.glb#Scene0"));
         });
     // 地面碰撞体
-    let rigid_body = RigidBodyBuilder::new_static();
-    let collider = ColliderBuilder::cuboid(10., 0.05, 10.);
-    commands.spawn_bundle((
-        Transform::from_xyz(0.0, 0.0, 0.0),
-        GlobalTransform::identity(),
-        rigid_body,
-        collider,
-    ));
+    let rigid_body = RigidBodyBundle {
+        position: [0.0, 0.0, 0.0].into(),
+        ..RigidBodyBundle::default()
+    };
+    let collider = ColliderBundle {
+        shape: ColliderShape::cuboid(10.0, 0.0005, 10.0),
+        ..ColliderBundle::default()
+    };
+    commands
+        .spawn_bundle(rigid_body)
+        .insert_bundle(collider)
+        .insert(ColliderDebugRender::with_id(2));
 
     // 车体
-    let rigid_body = RigidBodyBuilder::new_dynamic().translation(0.0, 13.0, 0.0);
-    let collider = ColliderBuilder::ball(1.);
+    let rigid_body = RigidBodyBundle {
+        position: [0.0, 10.0, 0.0].into(),
+        ..RigidBodyBundle::default()
+    };
+    let collider = ColliderBundle {
+        shape: ColliderShape::ball(1.0),
+        ..ColliderBundle::default()
+    };
 
     commands
-        .spawn_bundle((
-            Transform {
-                translation: Vec3::new(0., 5., 0.),
-                scale: Vec3::new(1., 1., 1.),
-                rotation: Quat::from_rotation_x(0.),
-            },
-            GlobalTransform::identity(),
-            rigid_body,
-            collider,
-        ))
+        .spawn_bundle(rigid_body)
+        .insert_bundle(collider)
+        .insert(ColliderDebugRender::with_id(1))
         .with_children(|parent| {
             parent.spawn_scene(asset_server.load("glb/AE86.glb#Scene0"));
         });

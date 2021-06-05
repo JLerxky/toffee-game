@@ -121,7 +121,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
     // 地面
     commands
         .spawn_bundle((
-            Transform::from_xyz(0.0, 8.0, 0.0),
+            Transform::from_xyz(0.0, 10.0, 0.0),
             GlobalTransform::identity(),
         ))
         .with_children(|parent| {
@@ -129,20 +129,23 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
     // 地面碰撞体
     let rigid_body = RigidBodyBundle {
+        body_type: RigidBodyType::Static,
         position: [0.0, 0.0, 0.0].into(),
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
-        shape: ColliderShape::cuboid(10.0, 0.0005, 10.0),
+        shape: ColliderShape::cuboid(10.0, 0.05, 10.0),
         ..ColliderBundle::default()
     };
     commands
         .spawn_bundle(rigid_body)
         .insert_bundle(collider)
-        .insert(ColliderDebugRender::with_id(2));
+        .insert(ColliderPositionSync::Discrete)
+        .insert(ColliderDebugRender::with_id(0));
 
     // 车体
     let rigid_body = RigidBodyBundle {
+        body_type: RigidBodyType::Dynamic,
         position: [0.0, 10.0, 0.0].into(),
         ..RigidBodyBundle::default()
     };
@@ -154,6 +157,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn_bundle(rigid_body)
         .insert_bundle(collider)
+        .insert(ColliderPositionSync::Discrete)
         .insert(ColliderDebugRender::with_id(1))
         .with_children(|parent| {
             parent.spawn_scene(asset_server.load("glb/AE86.glb#Scene0"));

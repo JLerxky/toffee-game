@@ -31,10 +31,8 @@ pub fn engine_start() {
             resizable: false,
             // 是否有窗口外壳
             decorations: true,
-            // width: 1366f32,
-            // height: 768f32,
-            width: 1920f32,
-            height: 1080f32,
+            width: 1200f32,
+            height: 600f32,
             // 窗口模式
             mode: WindowMode::Windowed,
             // 鼠标隐藏并锁定
@@ -212,6 +210,10 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
     let rigid_body = RigidBodyBundle {
         body_type: RigidBodyType::Dynamic,
         position: [0.0, 10.25, -3.0].into(),
+        forces: RigidBodyForces {
+            gravity_scale: 30f32,
+            ..Default::default()
+        },
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
@@ -276,7 +278,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert_bundle(collider)
         .insert(ColliderPositionSync::Discrete)
         .insert(ColliderDebugRender::with_id(1))
-        // .insert(CarPartTag::Wheel)
+        .insert(CarPartTag::Wheel)
         .id();
 
     // 车轮4
@@ -294,27 +296,26 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert_bundle(collider)
         .insert(ColliderPositionSync::Discrete)
         .insert(ColliderDebugRender::with_id(1))
-        // .insert(CarPartTag::Wheel)
+        .insert(CarPartTag::Wheel)
         .id();
 
-    let o = Point3::origin();
     let z = Vector3::x_axis();
 
     // 左头车轮链接
-    let joint = RevoluteJoint::new(o, z, [-2.1, 0.0, 2.5].into(), z);
+    let joint = RevoluteJoint::new([0.0, 0.0, 2.0].into(), z, [-2.1, 0.0, 0.0].into(), z);
     commands.spawn_bundle((JointBuilderComponent::new(joint, body_entity, left_entity),));
     // 右头车轮链接
-    let joint = RevoluteJoint::new(o, z, [2.1, 0.0, 2.5].into(), z);
+    let joint = RevoluteJoint::new([0.0, 0.0, 2.0].into(), z, [2.1, 0.0, 0.0].into(), z);
     commands.spawn_bundle((JointBuilderComponent::new(joint, body_entity, right_entity),));
     // 左尾车轮链接
-    let joint = RevoluteJoint::new(o, z, [-2.1, 0.0, -2.5].into(), z);
+    let joint = RevoluteJoint::new([0.0, 0.0, -2.0].into(), z, [-2.1, 0.0, 0.0].into(), z);
     commands.spawn_bundle((JointBuilderComponent::new(
         joint,
         body_entity,
         left_tail_entity,
     ),));
     // 右尾车轮链接
-    let joint = RevoluteJoint::new(o, z, [2.1, 0.0, -2.5].into(), z);
+    let joint = RevoluteJoint::new([0.0, 0.0, -2.0].into(), z, [2.1, 0.0, 0.0].into(), z);
     commands.spawn_bundle((JointBuilderComponent::new(
         joint,
         body_entity,

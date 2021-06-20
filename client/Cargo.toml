@@ -11,7 +11,7 @@ bevy = "0.5"
 bevy_rapier3d = "0.10.0"
 bevy_egui = "0.5"
 bevy_flycam = "0.5"
-tokio = {version = "1.2", features = ["full"]}
+tokio = {version = "1.7", features = ["full"]}
 rand = "0.8"
 
 [[example]]

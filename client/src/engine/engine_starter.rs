@@ -211,13 +211,13 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         body_type: RigidBodyType::Dynamic,
         position: [0.0, 10.25, -3.0].into(),
         forces: RigidBodyForces {
-            gravity_scale: 30f32,
+            gravity_scale: 1000f32,
             ..Default::default()
         },
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
-        shape: ColliderShape::cuboid(1.0, 0.5, 3.0),
+        shape: ColliderShape::cuboid(0.3, 0.3, 3.0),
         ..ColliderBundle::default()
     };
     let body_entity = commands
@@ -234,7 +234,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
-        shape: ColliderShape::cuboid(1.0, 1.0, 1.0),
+        shape: ColliderShape::ball(1.0),
         ..ColliderBundle::default()
     };
     let left_entity = commands
@@ -252,7 +252,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
-        shape: ColliderShape::cuboid(1.0, 1.0, 1.0),
+        shape: ColliderShape::ball(1.0),
         ..ColliderBundle::default()
     };
     let right_entity = commands
@@ -270,7 +270,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
-        shape: ColliderShape::cuboid(1.0, 1.0, 1.0),
+        shape: ColliderShape::ball(1.0),
         ..ColliderBundle::default()
     };
     let left_tail_entity = commands
@@ -288,7 +288,7 @@ pub fn setup_physics(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..RigidBodyBundle::default()
     };
     let collider = ColliderBundle {
-        shape: ColliderShape::cuboid(1.0, 1.0, 1.0),
+        shape: ColliderShape::ball(1.0),
         ..ColliderBundle::default()
     };
     let right_tail_entity = commands
@@ -351,7 +351,7 @@ fn apply_forces(
 
                     // 直接设置速度
                     // rb_vel.linvel = [1.0, 0.0, 0.0].into();
-                    rb_vel.angvel = [5.0, 0.0, 0.0].into();
+                    rb_vel.angvel = [20.0, 0.0, 0.0].into();
                     // println!("{:?}", rb_vel.linvel);
                 }
                 _ => {}

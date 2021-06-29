@@ -9,7 +9,7 @@ use protocol::{
     route::GameRoute,
 };
 use rand::Rng;
-use rapier3d::{na::Vector3, prelude::*};
+use rapier3d::prelude::*;
 use tokio::sync::{
     mpsc::{Receiver, Sender},
     Mutex,
@@ -169,14 +169,10 @@ async fn send_aync(
             {
                 let mut state = EntityState {
                     id: body.user_data as u64,
-                    translation: (
-                        collider.position().translation.x,
-                        collider.position().translation.y,
-                    ),
+                    translation: collider.position().translation.into(),
                     rotation: collider.position().rotation.angle(),
-                    linvel: (body.linvel().x, body.linvel().y),
-                    // TODO
-                    angvel: (0., 0.),
+                    linvel: body.linvel().xyz().into(),
+                    angvel: body.angvel().xyz().into(),
                     texture: (0, 0, 0),
                     entity_type: EntityType::Moveable,
                     animate: 0,
@@ -273,10 +269,10 @@ pub async fn clean_body(
             // 判断玩家实体是否还在线
             let mut entity_state = EntityState {
                 id: 0,
-                translation: (0., 0.),
+                translation: [0.; 3],
                 rotation: 0.,
-                linvel: (0., 0.),
-                angvel: (0., 0.),
+                linvel: [0.; 3],
+                angvel: [0.; 3],
                 texture: (0, 0, 0),
                 entity_type: EntityType::Static,
                 animate: 0,
@@ -332,10 +328,10 @@ pub async fn wait_for_net(
                         let player_texture_index: u32 = rand::thread_rng().gen_range(1..24);
                         let rb_state = EntityState {
                             id: login_data.uid as u64,
-                            translation: (0., 0.),
+                            translation: [0.; 3],
                             rotation: 0.,
-                            linvel: (0., 0.),
-                            angvel: (0., 0.),
+                            linvel: [0.; 3],
+                            angvel: [0.; 3],
                             texture: (player_texture_index, 4, 3),
                             entity_type: EntityType::Player,
                             animate: 1,
@@ -379,14 +375,11 @@ pub async fn wait_for_net(
                                 if body.is_dynamic() {
                                     let mut state = EntityState {
                                         id: body.user_data as u64,
-                                        translation: (
-                                            collider.position().translation.x,
-                                            collider.position().translation.y,
-                                        ),
+                                        translation: collider.position().translation.into(),
                                         rotation: collider.position().rotation.angle(),
-                                        linvel: (body.linvel().x, body.linvel().y),
+                                        linvel: body.linvel().xyz().into(),
                                         // TODO
-                                        angvel: (0., 0.),
+                                        angvel: body.angvel().xyz().into(),
                                         texture: (0, 0, 0),
                                         entity_type: EntityType::Static,
                                         animate: 0,

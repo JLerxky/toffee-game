@@ -15,13 +15,13 @@ pub struct EntityState {
     // 8b[0..7]
     pub id: u64,
     // 8b[8..15]
-    pub translation: (f32, f32),
+    pub translation: [f32; 3],
     // 8b[16..23]
     pub rotation: f32,
     // 8b[24..31]
-    pub linvel: (f32, f32),
+    pub linvel: [f32; 3],
     // 8b[32..39]
-    pub angvel: (f32, f32),
+    pub angvel: [f32; 3],
     // 5b[40..44]
     pub texture: (u32, u8, u8),
     // 1b[45]

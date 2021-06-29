@@ -26,7 +26,7 @@ fn test_bincode() {
     use crate::data::control_data::ControlData;
     let packet: Packet = Packet::Game(GameRoute::Control(ControlData {
         uid: 0,
-        direction: (-1., 0.11),
+        direction: [-1., 0.11, 1.0],
         action: 1,
     }));
     let packet = bincode::serialize(&packet).unwrap();

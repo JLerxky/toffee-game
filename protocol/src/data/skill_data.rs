@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 // 13b
 pub struct SkillData {
     pub uid: u32,
-    pub direction: (f32, f32),
+    pub direction: [f32; 3],
     pub skill_type: SkillType,
     pub texture: (u32, u8, u8),
 }

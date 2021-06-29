@@ -1,0 +1,11 @@
+[package]
+name = "data"
+version = "0.1.0"
+authors = ["JLer <472102489@qq.com>"]
+edition = "2018"
+
+[dependencies]
+protocol = { path = "../protocol" }
+config = { path = "../config" }
+
+bincode = "1.3"

@@ -2,6 +2,7 @@
 members = [
     "config",
     "protocol",
+    "data",
     "client",
     "server",
 ]

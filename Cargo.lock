@@ -975,6 +975,9 @@ dependencies = [
  "bevy_egui",
  "bevy_flycam",
  "bevy_rapier3d",
+ "bincode",
+ "config",
+ "protocol",
  "rand",
  "tokio",
 ]
@@ -1376,6 +1379,15 @@ dependencies = [
  "darling_core",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "data"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "config",
+ "protocol",
 ]
 
 [[package]]

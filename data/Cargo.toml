@@ -8,4 +8,4 @@ edition = "2018"
 protocol = { path = "../protocol" }
 config = { path = "../config" }
 
-bincode = "1.3"
+bincode = "1.3.3"
